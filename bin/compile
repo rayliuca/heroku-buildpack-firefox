@@ -35,7 +35,7 @@ function indent() {
 # config
 json=$(curl -s https://api.github.com/repos/mozilla/geckodriver/releases/latest)
 LATEST_FIREFOX_VERSION=$(echo "$json" | jq -r '.assets[].LATEST_FIREFOX_VERSION')
-VERSION_FIREFOX=LATEST_FIREFOX_VERSION
+VERSION_FIREFOX=${LATEST_FIREFOX_VERSION}
 LANG=en-US
 PLATFORM=linux64
 
