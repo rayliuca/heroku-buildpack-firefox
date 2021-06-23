@@ -33,11 +33,11 @@ function indent() {
 }
 
 # config
-VERSION_FIREFOX=57.0.1
+json=$(curl -s https://api.github.com/repos/mozilla/geckodriver/releases/latest)
+LATEST_FIREFOX_VERSION=$(echo "$json" | jq -r '.assets[].LATEST_FIREFOX_VERSION')
+VERSION_FIREFOX=LATEST_FIREFOX_VERSION
 LANG=en-US
 PLATFORM=linux64
-
-VERSION_GECKODRIVER=0.19.1
 
 # Buildpack URL
 ARCHIVE_NAME_FIREFOX=firefox
@@ -45,14 +45,16 @@ ARCHIVE_NAME_GECKODRIVER=geckodriver
 FILE_NAME_FIREFOX=${ARCHIVE_NAME_FIREFOX}-${VERSION_FIREFOX}.tar.bz2
 FILE_NAME_GECKODRIVER=${ARCHIVE_NAME_GECKODRIVER}-v${VERSION_GECKODRIVER}-${PLATFORM}.tar.gz
 BUILDPACK_FIREFOX_PACKAGE="https://download.mozilla.org/?product=firefox-${VERSION_FIREFOX}-SSL&os=${PLATFORM}&lang=${LANG}"
-BUILDPACK_GECKODRIVER_PACKAGE="https://github.com/mozilla/geckodriver/releases/download/v${VERSION_GECKODRIVER}/${FILE_NAME_GECKODRIVER}"
+
+json=$(curl -s https://api.github.com/repos/mozilla/geckodriver/releases/latest)
+BUILDPACK_GECKODRIVER_PACKAGE=$(echo "$json" | jq -r '.assets[].browser_download_url | select(contains("linux64"))')
 
 # Install correct dependencies according to $STACK
 case "$STACK" in
   "cedar-14")
     PACKAGES="libxss1"
     ;;
-  "heroku-16" | "heroku-18")
+  "heroku-16" | "heroku-18" | "heroku-20")
     PACKAGES="
       libappindicator1
       libasound2
